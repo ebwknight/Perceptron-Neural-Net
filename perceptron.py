@@ -7,12 +7,16 @@ class Perceptron(object):
     def __init__(self):
 
         self.weights = random.uniform(low=-0.15, high=0.15, size=(3, 2))
+        self.num_layers = 3
+        #self.biases = random.uniform(size=(2))
+        self.epochs = 1000
+        self.lr = 0.01
 
 
     def feedForward(self, inputs):
 
-        for w in (self.weights):
-            output = sigmoid(dot(inputs, w))
+        for weight, bias in zip(self.biases, self.weights):
+            output = sigmoid(dot(inputs, weight) + bias)
         return output
 
     def sigmoid(x):
@@ -22,31 +26,33 @@ class Perceptron(object):
         return x * (1 - x)
 
 
-    def train(inputs, expected_output, weights, bias, learning_rate, training_iterations):
-        for epoch in range(training_iterations):
+    def train(inputs, expected_output):
+        for epoch in range(self.epochs):
         # Forward pass -- Pass the training set through the network.
-            predicted_output = learn(inputs, weights, bias)
+            predicted_output = feedForward(inputs)
 
         # Backaward pass
         # Calculate the error
             error = sigmoid_derivative(predicted_output) * (expected_output - predicted_output)
 
         # Adjust the weights and bias by a factor
-            weight_factor = dot(inputs.T, error) * learning_rate
-            bias_factor = error * learning_rate
+            for w in (self.weights):
+                weight_factor = dot(inputs.T, error) * learning_rate
+            #bias_factor = error * learning_rate
 
         # Update the synaptic weights
-            weights += weight_factor
+                w += weight_factor
 
         # Update the bias
-            bias += bias_factor
+            #self.bias += bias_factor
 
             if ((epoch % 1000) == 0):
                 print("Epoch", epoch)
                 print("Predicted Output = ", predicted_output.T)
                 print("Expected Output = ", expected_output.T)
                 print()
-        return weights
+                
+        return self.weights
 
 
 
