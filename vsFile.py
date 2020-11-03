@@ -1,23 +1,23 @@
 import numpy as np
+import random
 import math
-#from numpy import exp, dot, random, array
 LEARNING_RATE = 0.01
 NUM_EPOCHS = 1000
 NUM_EXAMPLES = 5620
 DIMENSIONS = [64, 10]
 
 
-#read in and store data
+
 
 class Network(object):
 
     def __init__(self):
 
-        self.examples = [] #array of Example objects storin ginput and output data
-        self.weights = self.initializeWeights() #creates a 10 x 64 array of randomly initialized weights
-
-        self.readData() #reads in data and populates self.examples
-  
+        self.data = readData()
+        self.testSet = []
+        self.trainingSet = []
+        self.weights = self.initializeWeights() #creates a 10 x 64 array of randomly initialized weights  
+        self.splitData(self.data)
 
     def initializeWeights(self):
 
@@ -25,34 +25,24 @@ class Network(object):
         #rows represent output nodes, each columb being an input node's data
         return np.random.uniform(low=-0.15, high=0.15, size=(10,64))
 
-    """
-    def feedForward(self, inputData):
-        #print(self.sigmoid(np.dot(self.weights, inputData)))
-        output = [] #array to hold nets output data
-        
-        for outputNode in self.weights: 
-            weightedSum = 0 
-            inputNode = 0 #keeps track of which node in data to index
-            #print(outputNode)
+    def splitData(self, data):
 
-            for inputNodeWeight in outputNode:
-                #print("inputNodeWeight: " + inputNodeWeight)
-                #print("inputData[inputNode]: " + inputData[inputNode])
-                weightedSum += inputNodeWeight * inputData[inputNode]
-                inputNode += 1
+        random.shuffle(data)
+        split = int(NUM_EXAMPLES * 0.8)
+        self.trainingSet = data[:split]
+        self.testSet = data[split+1:]
 
-            output.append(self.sigmoid(weightedSum))
-
-        return output
-    """
 
     def train(self):
 
-        for epoch in range(2):
+        for epoch in range(5): 
+            averageError = 0
+
 
             print("Epoch number: " + str(epoch))
-            for example in self.examples:  
+            for example in self.trainingSet:  
                 outNodeNum = 0
+                errorVector = []
 
                 for outputNode in self.weights: 
                     weightedSum = 0 
@@ -60,41 +50,28 @@ class Network(object):
 
                     for inputNodeWeight in outputNode:
                         weightedSum += inputNodeWeight * example.inputData[inputNodeNum]
-                        
-                        output = self.sigmoid(weightedSum)
-                        error = example.expectedOutput[outNodeNum] - output
-                        weightAdjustment = self.sigmoidDerivitive(output) * error * example.inputData[inputNodeNum] * LEARNING_RATE
-                        self.weights[outNodeNum][inputNodeNum] += weightAdjustment
-
                         inputNodeNum += 1
-                    outNodeNum += 1
-  
 
-        
+                    output = self.sigmoid(weightedSum)
+                    error = example.expectedOutput[outNodeNum] - output
+                    errorVector.append(error)
 
-    def readData(self):
+                    adjustmentNode = 0
+                    for inputNodeWeight in outputNode:
+                        #print("output: " + str(output))
+                        #print(error)
+                        #print(example.inputData[adjustmentNode])
 
-        file = open('digit-examples-all.txt', 'r') 
-        lines = file.readlines()
-
-        numDataPoints = len(lines)//2
-        input_data = np.empty(shape=(numDataPoints ,2, 64))
-
-        bitMaps = []
-        numAnswers = []
-
-        for i in range(len(lines)):
-            if i % 2 == 0:
-                bitMaps.append(lines[i].split()[1:-1])
-            else:
-                numAnswers.append(lines[i].split()[1:-1])
-
-
-        for i in range(numDataPoints):
-
-            floatMap = [float(ele) for ele in bitMaps[i]]
-            floatAns = [float(ele) for ele in numAnswers[i]]
-            self.examples.append(Example(floatMap, floatAns))
+                        weightAdjustment = self.sigmoidDerivitive(output) * error * example.inputData[adjustmentNode] * LEARNING_RATE
+                        print(weightAdjustment)
+                        #break
+                        self.weights[outNodeNum][adjustmentNode] += weightAdjustment
+                    #break
+                #break
+                outNodeNum += 1
+                correctness = eucDistance(errorVector)
+                averageError += correctness
+            print("Error: " + str(averageError/len(self.trainingSet)))
 
 
     def sigmoid(self, x):
@@ -103,17 +80,8 @@ class Network(object):
 
     def sigmoidDerivitive(self, x):
         return x * (1 - x)
-        #print(input_data[0])
-                     
 
-"""
-class Node(object):
 
-    def __init__(self, type):
- 
-        #self.bias
-        self.type = type
-"""
 class Example(object):
 
     def __init__(self, inputData, expectedOutput):
@@ -121,10 +89,43 @@ class Example(object):
         self.inputData = inputData
         self.expectedOutput = expectedOutput
 
-    def __repr__(self):
 
-        return (self.inputData, self.expectedOutput)
+def eucDistance(list1):
 
+    sqrdErrors = [i ** 2 for i in list1]
+    totalVal = 0
+
+    for val in sqrdErrors:
+        totalVal += val
+
+    return math.sqrt(totalVal)
+     
+
+
+def readData():
+
+    file = open('digit-examples-all.txt', 'r') 
+    lines = file.readlines()
+
+    numDataPoints = len(lines)//2
+    bitMaps = []
+    numAnswers = []
+    data = []
+
+    for i in range(len(lines)):
+        if i % 2 == 0:
+            bitMaps.append(lines[i].split()[1:-1])
+        else:
+            numAnswers.append(lines[i].split()[1:-1])
+
+
+    for i in range(numDataPoints):
+
+        floatMap = [float(ele) for ele in bitMaps[i]]
+        floatAns = [float(ele) for ele in numAnswers[i]]
+        data.append(Example(floatMap, floatAns))
+
+    return data
 
 
 if __name__ == "__main__":
