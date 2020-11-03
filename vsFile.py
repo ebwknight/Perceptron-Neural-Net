@@ -25,13 +25,11 @@ class Network(object):
         #rows represent output nodes, each columb being an input node's data
         return np.random.uniform(low=-0.15, high=0.15, size=(10,64))
 
-
+    """
     def feedForward(self, inputData):
         #print(self.sigmoid(np.dot(self.weights, inputData)))
         output = [] #array to hold nets output data
         
-        #testweightedSum = [a + b for a, b in self.weights]
-
         for outputNode in self.weights: 
             weightedSum = 0 
             inputNode = 0 #keeps track of which node in data to index
@@ -46,36 +44,33 @@ class Network(object):
             output.append(self.sigmoid(weightedSum))
 
         return output
-
+    """
 
     def train(self):
 
         for epoch in range(2):
 
             print("Epoch number: " + str(epoch))
-            for example in self.examples:
+            for example in self.examples:  
+                outNodeNum = 0
 
-                #returns an array of 10 numbers representing 
-                #print("input: " + str(example.inputData))
-                #print("target output: " + str(example.expectedOutput))
-                netOutput = self.feedForward(example.inputData)
-                #print("Output: " + str(netOutput))
-                error = [a - b for a, b in zip(example.expectedOutput, netOutput)]
-                #print(error)
+                for outputNode in self.weights: 
+                    weightedSum = 0 
+                    inputNodeNum = 0 #keeps track of which node in data to index
 
-                for i in range(len(error)):
+                    for inputNodeWeight in outputNode:
+                        weightedSum += inputNodeWeight * example.inputData[inputNodeNum]
+                        
+                        output = self.sigmoid(weightedSum)
+                        error = example.expectedOutput[outNodeNum] - output
+                        weightAdjustment = self.sigmoidDerivitive(output) * error * example.inputData[inputNodeNum] * LEARNING_RATE
+                        self.weights[outNodeNum][inputNodeNum] += weightAdjustment
 
-                    for j in range(len(example.inputData)):
+                        inputNodeNum += 1
+                    outNodeNum += 1
+  
 
-                        weightAdjustment = self.sigmoidDerivitive(netOutput[i]) * error[i] * example.inputData[j] * LEARNING_RATE
-                        self.weights[i][j] += weightAdjustment
-                #update rule = old weight + sigdiv(node output) * (error * original input * learning rate)
-                
-                
-                #weightAdjustment = np.dot(examples.inputData, error) * LEARNING_RATE
-                #self.weights += weightAdjustment
-            
-        return self.weights
+        
 
     def readData(self):
 
@@ -139,7 +134,8 @@ if __name__ == "__main__":
     #print(net.examples[0].inputData)
     net.train()
 
-    
+  
+
 
     
 
