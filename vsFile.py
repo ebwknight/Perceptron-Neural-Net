@@ -1,12 +1,11 @@
 import numpy as np
 import random
 import math
-LEARNING_RATE = 0.01
+LEARNING_RATE = 0.1
 NUM_EPOCHS = 1000
 NUM_EXAMPLES = 5620
 DIMENSIONS = [64, 10]
-
-
+TRAINING_SPLIT = 0.9
 
 
 class Network(object):
@@ -28,16 +27,15 @@ class Network(object):
     def splitData(self, data):
 
         random.shuffle(data)
-        split = int(NUM_EXAMPLES * 0.8)
+        split = int(NUM_EXAMPLES * (1 - TRAINING_SPLIT))
         self.trainingSet = data[:split]
         self.testSet = data[split+1:]
 
 
     def train(self):
 
-        for epoch in range(5): 
+        for epoch in range(100): 
             averageError = 0
-
 
             print("Epoch number: " + str(epoch))
             for example in self.trainingSet:  
@@ -58,20 +56,43 @@ class Network(object):
 
                     adjustmentNode = 0
                     for inputNodeWeight in outputNode:
-                        #print("output: " + str(output))
-                        #print(error)
-                        #print(example.inputData[adjustmentNode])
 
                         weightAdjustment = self.sigmoidDerivitive(output) * error * example.inputData[adjustmentNode] * LEARNING_RATE
-                        print(weightAdjustment)
-                        #break
+                        
                         self.weights[outNodeNum][adjustmentNode] += weightAdjustment
-                    #break
+                        adjustmentNode += 1
+
+                    outNodeNum += 1
                 #break
-                outNodeNum += 1
+                    
                 correctness = eucDistance(errorVector)
                 averageError += correctness
             print("Error: " + str(averageError/len(self.trainingSet)))
+
+
+    def test(self):
+
+        averageError = 0
+
+        for example in self.testSet:  
+                outNodeNum = 0
+                errorVector = []
+
+                for outputNode in self.weights: 
+                    weightedSum = 0 
+                    inputNodeNum = 0 #keeps track of which node in data to index
+
+                    for inputNodeWeight in outputNode:
+                        weightedSum += inputNodeWeight * example.inputData[inputNodeNum]
+                        inputNodeNum += 1
+
+                    output = self.sigmoid(weightedSum)
+                    error = example.expectedOutput[outNodeNum] - output
+                    errorVector.append(error)
+
+                correctness = eucDistance(errorVector)
+                averageError += correctness
+        print("Error: " + str(averageError/len(self.testSet)))
 
 
     def sigmoid(self, x):
@@ -134,6 +155,7 @@ if __name__ == "__main__":
     #print(net.examples[0].expectedOutput)
     #print(net.examples[0].inputData)
     net.train()
+    net.test()
 
   
 
