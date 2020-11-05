@@ -6,37 +6,38 @@ import matplotlib.pyplot as plt
 LEARNING_RATE = 0.01 #learning rate
 NUM_EPOCHS = 3 #number of EPOCHS
 NUM_EXAMPLES = 5620 #number of input examples
-TRAINING_GRAPH = [NUM_EPOCHS] #Keeps track of average error across epochs
-TEST_GRAPH = [NUM_EPOCHS]
-BAR_GRAPH_DATA = [10]
+TRAINING_GRAPH = [] #Keeps track of average error across epochs
+TEST_GRAPH = [] #Holds acerage error per epoch
+BAR_GRAPH_DATA = [] #array to hold average error per test data split
 
-#Perceptron class 
+#Perceptron class that reads hand-written digits
 class Network(object):
 
     def __init__(self):
 
-        self.data = readData()
-        self.testSet = []
-        self.trainingSet = []
-        self.weights = self.initializeWeights() #creates a 10 x 64 array of randomly initialized weights  
-        #self.splitData(self.data)
+        self.data = readData() #holds an array of Exmaple objects containing input and target output data
+        self.testSet = [] #holds test set example objects
+        self.trainingSet = [] #holds trning set example objects
+        self.weights = self.initializeWeights() #creates a 10 x 65 array of randomly initialized weights  
+
 
     def initializeWeights(self):
-
-        #create 10 x 64 matrix holding randomly generated weights
+        #create 10 x 65 matrix holding randomly generated weights
         #rows represent output nodes, each columb being an input node's data
         return np.random.uniform(low=-0.1, high=0.1, size=(10,65))
 
+    #Takes read-in data and a desired data split
+    #sorts data into the training set and test set arrays
     def splitData(self, data, dataSplit):
 
-        random.shuffle(data)
+        random.shuffle(data) #shuffle all the data
+        #split relative to data size
         split = int(NUM_EXAMPLES * dataSplit)
         self.trainingSet = data[:split]
         self.testSet = data[split+1:]
-        #print(self.trainingSet)
-        #print(self.testSet)
 
 
+    #Main training function that takes a desired data split
     def train(self, dataSplit):
 
         self.weights = self.initializeWeights() #reset weights for next data split
@@ -44,10 +45,10 @@ class Network(object):
         print("Traning on split: " + str(dataSplit))
 
         for epoch in range(NUM_EPOCHS): 
-            errorSum = 0
+            errorSum = 0 #used to keep track of average error
 
             print("Epoch number: " + str(epoch + 1))
-            for example in self.trainingSet:  
+            for example in self.trainingSet: #for example in training set:
                 outNodeNum = 0 #used to index output nodes
                 errorVector = [] #array to keep track of error for each example
 
@@ -88,20 +89,26 @@ class Network(object):
                 #add to average error then divide by length of training set to get average
                 errorSum += correctness
 
-            testError = self.test()
+            testError = self.test() #try traing data against current weights and return average error of test set
+            #training set average error
             averageError = errorSum/len(self.trainingSet)
+            #Save these two values for graphing later
             TRAINING_GRAPH.append(averageError)
             TEST_GRAPH.append(testError)
-            #GRAPH_DATA.append([TRAINING_SPLIT, 0, epoch, averageError])
+
+            #If on the last epoch, append test set correctness to the bar graph data
+            if epoch == (NUM_EPOCHS - 1):
+                BAR_GRAPH_DATA.appen(testError)
+
             print("Training Set Euclidian Distance: " + str(averageError))
             print("Test Set Euclidian Distance: " + str(testError))
 
 
-
+    #Function that feeds test set data through the net without adjusting weights
+    #returns the average error of the test set
     def test(self):
 
-        #print("Starting Test Set")
-        errorSum = 0
+        errorSum = 0 #Keeps track of sum of errors
 
         for example in self.testSet:  
             outNodeNum = 0 #used to index output nodes
@@ -125,14 +132,15 @@ class Network(object):
                 
                 #increase index of output node
                 outNodeNum += 1
-            #break
+
+                #No weight adjustment
+
             #calculates Euclidian distance between target outputs and net output 
             correctness = eucDistance(errorVector)
             #add to average error then divide by length of training set to get average
             errorSum += correctness
 
-        averageError = errorSum/len(self.testSet)
-        BAR_GRAPH_DATA.append(averageError)
+        averageError = errorSum/len(self.testSet) #average a
         #GRAPH_DATA.append([TRAINING_SPLIT, 0, epoch, averageError])
         return averageError
 
@@ -197,7 +205,7 @@ def readData():
 
     return data
 
-#Function to graph Net data
+#Function to graph training set error vs test set error per epoch
 def graphEpochs(trainingData, testData, trainingSplit):
 
     plt.plot(trainingData)
