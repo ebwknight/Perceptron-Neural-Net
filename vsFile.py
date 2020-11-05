@@ -4,7 +4,7 @@ import math
 import matplotlib.pyplot as plt
 
 LEARNING_RATE = 0.01 #learning rate
-NUM_EPOCHS = 3 #number of EPOCHS
+NUM_EPOCHS = 50 #number of EPOCHS
 NUM_EXAMPLES = 5620 #number of input examples
 TRAINING_GRAPH = [] #Keeps track of average error across epochs
 TEST_GRAPH = [] #Holds acerage error per epoch
@@ -206,6 +206,7 @@ def readData():
     return data
 
 #Function to graph training set error vs test set error per epoch
+#should guage overfitting and underfitting
 def graphEpochs(trainingData, testData, trainingSplit):
 
     plt.plot(trainingData)
@@ -218,33 +219,31 @@ def graphEpochs(trainingData, testData, trainingSplit):
     plt.show()
     
 
-def graph(errorData, trainingSplits):
+def graph(trainingSplits, errorData):
 
-    plt.bar(trainingSplits, errorData)
+    plt.plot(trainingSplits, errorData)
+    plt.title("Training Split vs Test Error")
+    plt.xlabel("Training Split")
+    plt.ylabel("Test Error")
     plt.show()
 
 if __name__ == "__main__":
 
+    #lines to test graph functionality
+    # y = [0.9002910468679929, 0.8180141685100354, 0.7431281297271973, 0.7009388577523336, 0.6612819516465702, 0.6310570119479071, 0.5972628364656487, 0.5793497428478508, 0.5578205773847719]
+    # x = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    # graph(x, y)
 
-    y = [0.9002910468679929, 0.8180141685100354, 0.7431281297271973, 0.7009388577523336, 0.6612819516465702, 0.6310570119479071, 0.5972628364656487, 0.5793497428478508, 0.5578205773847719]
-    x = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    graph(x, y)
-    # net = Network()
-    # trainingSplits = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    net = Network()
+    trainingSplits = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
 
-    # #print(net.examples[0].expectedOutput)
-    # #print(net.examples[0].inputData)
-    # #print(net.weights)
-    # #net.train(0.7)
-    # #graphEpochs(TRAINING_GRAPH, TEST_GRAPH, 0.7)
-
-    # for split in trainingSplits:
-    #     net.train(split)
-    # print(BAR_GRAPH_DATA)
-    # print(trainingSplits)
-    # bargraph(BAR_GRAPH_DATA, trainingSplits)
-    #     #graphEpochs(TRAINING_GRAPH, TEST_GRAPH, split)
+    for split in trainingSplits:
+        net.train(split)
+    print(BAR_GRAPH_DATA)
+    print(trainingSplits)
+    graph(trainingSplits, BAR_GRAPH_DATA)
+        #graphEpochs(TRAINING_GRAPH, TEST_GRAPH, split)
 
   
 
