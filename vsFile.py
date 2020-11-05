@@ -98,7 +98,7 @@ class Network(object):
 
             #If on the last epoch, append test set correctness to the bar graph data
             if epoch == (NUM_EPOCHS - 1):
-                BAR_GRAPH_DATA.appen(testError)
+                BAR_GRAPH_DATA.append(testError)
 
             print("Training Set Euclidian Distance: " + str(averageError))
             print("Test Set Euclidian Distance: " + str(testError))
@@ -218,28 +218,33 @@ def graphEpochs(trainingData, testData, trainingSplit):
     plt.show()
     
 
-def bargraph(errorData, trainingSplits):
+def graph(errorData, trainingSplits):
 
-    fig = plt.figure()
-    graph = fig.add_axes([0,0,1,1])
-    graph.bar(trainingSplits, errorData)
+    plt.bar(trainingSplits, errorData)
     plt.show()
 
 if __name__ == "__main__":
 
-    net = Network()
-    trainingSplits = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
-    #print(net.examples[0].expectedOutput)
-    #print(net.examples[0].inputData)
-    #print(net.weights)
-    #net.train(0.7)
-    #graphEpochs(TRAINING_GRAPH, TEST_GRAPH, 0.7)
 
-    for split in trainingSplits:
-        net.train(split)
-    
-    bargraph(BAR_GRAPH_DATA, trainingSplits)
-        #graphEpochs(TRAINING_GRAPH, TEST_GRAPH, split)
+    y = [0.9002910468679929, 0.8180141685100354, 0.7431281297271973, 0.7009388577523336, 0.6612819516465702, 0.6310570119479071, 0.5972628364656487, 0.5793497428478508, 0.5578205773847719]
+    x = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    graph(x, y)
+    # net = Network()
+    # trainingSplits = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+
+    # #print(net.examples[0].expectedOutput)
+    # #print(net.examples[0].inputData)
+    # #print(net.weights)
+    # #net.train(0.7)
+    # #graphEpochs(TRAINING_GRAPH, TEST_GRAPH, 0.7)
+
+    # for split in trainingSplits:
+    #     net.train(split)
+    # print(BAR_GRAPH_DATA)
+    # print(trainingSplits)
+    # bargraph(BAR_GRAPH_DATA, trainingSplits)
+    #     #graphEpochs(TRAINING_GRAPH, TEST_GRAPH, split)
 
   
 
