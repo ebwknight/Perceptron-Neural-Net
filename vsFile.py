@@ -210,9 +210,12 @@ def graphEpochs(trainingData, testData, trainingSplit):
     plt.show()
     
 
-def bargraph(data, trainingSplits):
-    
-    plt.bar(data, trainingSplits)
+def bargraph(errorData, trainingSplits):
+
+    fig = plt.figure()
+    graph = fig.add_axes([0,0,1,1])
+    graph.bar(trainingSplits, errorData)
+    plt.show()
 
 if __name__ == "__main__":
 
